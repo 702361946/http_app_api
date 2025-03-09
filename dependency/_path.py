@@ -51,13 +51,17 @@ if True:
     srln = setting_root_logger_name
 
 
-    def module_configuration_completed_and_exit(module_name: str) -> bool:
+    def module_configuration_completed_and_exit(module_name: str, message: str = None) -> bool:
         """
         报告模块配置完成并退出
         :param module_name: 模块名
+        :param message: 自定义消息
         :return: 永远返回True,除非Error
         """
-        logging.info(f"{module_name} ok and exit")
+        if message:
+            logging.info(message)
+        else:
+            logging.info(f"{module_name} ok and exit")
         logging.info(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
         return True
 

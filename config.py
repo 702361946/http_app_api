@@ -7,12 +7,10 @@ srln('config')
 
 if True:
     main_value = json.load('config')
-    if type(main_value).__name__ == 'dict':
+    if type(main_value).__name__ != 'dict':
         logging.error(f'get main_value error\n{main_value}')
         main_value = {
-            'open_s_or_r': None,
-            'user_name': None,
-            'user_password': None,
+            'open_s_or_r': None
         }
 
 mccae('config')
