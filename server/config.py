@@ -133,7 +133,6 @@ class HTTPMethod:
             'client_list': self.client_list,
             'version': self.version
         }
-        print(f"server_state\n{_state}")
         return _state
 
     def get_state_logging(self):
@@ -142,3 +141,4 @@ class HTTPMethod:
         logging.info("server_state")
         logging.info(_state)
         logging.info("END")
+        return True

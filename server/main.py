@@ -5,7 +5,18 @@ from .config import *
 
 
 def main():
-    pass
+    s = HTTPMethod()
+    app = s.server
+
+    @app.get('/server/state')
+    def start():
+        return s.get_state()
+
+    @app.get('/server/state_logging')
+    def start_logging():
+        return s.get_state_logging()
+
+    s.run()
 
 
 if __name__ == '__main__':
