@@ -1,10 +1,11 @@
 #  Copyright (c) 2025.
 #  702361946@qq.com(https://github.com/702361946)
-
 import os
 import socket
 import sys
-from http.server import HTTPServer, BaseHTTPRequestHandler
+
+import uvicorn
+from fastapi import FastAPI
 
 # 寻找包
 if True:
@@ -46,58 +47,6 @@ def get_local_ip():
         return "127.0.0.1"  # 如果失败返回本地回环地址
 
 
-def is_port_available(port, host='localhost'):
-    """测试端口是否可用于部署本地服务
-    :param port: 要测试的端口号
-    :param host: 目标主机，默认为localhost
-    :return: True表示端口可用，False表示端口已被占用
-    """
-    try:
-        # 创建一个TCP socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # 设置超时时间为1秒
-        sock.settimeout(1)
-        # 尝试绑定端口
-        sock.bind((host, port))
-        sock.close()
-        return True
-    except socket.error as e:
-        # 如果端口已被占用，会抛出socket.error异常
-        print(f"端口 {port} 已被占用: {e}")
-        return False
-
-
-def get_open_port():
-    """
-    获取可用端口
-    :return: 可用端口号，如果没有可用端口则返回False
-    """
-    start_port = 60000
-    while_open = True
-    while start_port != 60000 or while_open:
-        if is_port_available(start_port):
-            return start_port
-
-        if start_port == 60000:
-            while_open = False
-
-        start_port += 1
-        if start_port == 65535:
-            start_port = 1
-
-    return False
-
-
-# 定义处理类
-class HTTPRequestRrocessing(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
-        self.end_headers()
-        self.wfile.write(b'Hello, world!')
-        print(self.path)
-
-
 class HTTPMethod:
     def __init__(self):
         self.ip = server_config["server_fixed_ip"]
@@ -107,57 +56,59 @@ class HTTPMethod:
         self.client_list = []
         self.version = server_config["version"]
 
-        if server_config["server_fixed_ip"] is None:
-            self.ip = get_local_ip()
-        if server_config["server_fixed_port"] is None:
-            self.port = 60000
-        elif type(self.port).__name__ != 'int':
+        while True:
             try:
-                self.port = int(self.port)
-            except ValueError:
-                logging.error(f"配置端口无效:{self.port}")
-                print(f"配置端口无效:{self.port}")
-                self.port = 60000
-        elif self.port < 1025 or self.port > 65535:
-            logging.error(f"配置端口超出范围:{self.port}")
-            print(f"配置端口超出范围:{self.port}")
-            self.port = 60000
+                if self.ip is None:
+                    self.ip = get_local_ip()
 
-        logging.info(f"ip:{self.ip}")
-        logging.info(f"port:{self.port}")
+                elif type(self.ip).__name__ != 'str':
+                    logging.error(f"配置ip无效:{self.ip}")
+                    print(f"配置ip无效:{self.ip}")
+                    self.ip = get_local_ip()
 
-        create_an_attempt = 0
-        while create_an_attempt < 50:
-            try:
                 # 空ip会绑定到0.0.0.0上,这是不希望的
-                if self.ip == '' or self.ip == '0.0.0.0':
-                    raise WindowsError('ip不可绑定至0.0.0.0')
-                self.server = HTTPServer(
-                    (self.ip, self.port),
-                    lambda c, r, s: HTTPRequestRrocessing(c, r, s)
-                )
+                elif self.ip == '' or self.ip == '0.0.0.0':
+                    self.ip = input('ip不可绑定至0.0.0.0,请手动输入')
 
-                print(f"\n已成功创建\nip:{self.ip}\nport:{self.port}\n")
-                logging.info(f"ip&port:{self.ip}&{self.port}")
+                elif self.ip.split('.') != 4:
+                    logging.error(f"配置ip长度不足:{self.ip}")
+                    print(f"配置ip长度不足:{self.ip}")
+                    self.ip = get_local_ip()
 
+                for _ip in self.ip.split('.'):
+                    try:
+                        if int(_ip) < 0 or int(_ip) > 255:
+                            logging.error(f"ip段超出范围:{self.ip}")
+                            print(f"ip段超出范围:{self.ip}")
+                            self.ip = get_local_ip()
+                    except ValueError:
+                        logging.error(f"ip段包含其他字符:{self.ip}")
+                        print(f"ip段包含其他字符:{self.ip}")
+                        self.ip = get_local_ip()
+
+                if self.port is None:
+                    self.port = 60000
+                elif type(self.port).__name__ != 'int':
+                    try:
+                        self.port = int(self.port)
+                    except ValueError:
+                        logging.error(f"配置端口无效:{self.port}")
+                        print(f"配置端口无效:{self.port}")
+                        self.port = 60000
+                if self.port < 1025 or self.port > 65535:
+                    logging.error(f"配置端口超出范围:{self.port}")
+                    print(f"配置端口超出范围:{self.port}")
+                    self.port = 60000
+
+                logging.info(f"ip:{self.ip}")
+                logging.info(f"port:{self.port}")
+
+                self.server = FastAPI()
                 break
-            except WindowsError:
-                self.ip = input(f"此地址无效,请手动输入ip地址\n当前地址:{self.ip}")
-                create_an_attempt += 1
-            except OverflowError:
-                print(f"端口已被占用或不可用\n尝试更换端口中\n当前端口:{self.port}")
-                if self.port >= 65535 or self.port < 1025:
-                    self.port = 1025
-                else:
-                    self.port += 1
-                create_an_attempt += 1
             except Exception as e:
-                print(f"{e}")
-                create_an_attempt += 1
+                logging.error(e)
+                print(e)
 
-        if create_an_attempt >= 50:
-            logging.error(f"创建服务失败,尝试次数封顶")
-            print(f"创建服务失败,请检查配置")
 
     def run(self) -> bool:
         """
@@ -165,83 +116,12 @@ class HTTPMethod:
         :return: T/F
         """
         try:
-            print("启动中(启动成功后无提示)")
-            self.server.serve_forever()
+            print("启动中")
+            uvicorn.run(self.server, host=self.ip, port=self.port)
             return True
         except Exception as e:
             print(f"{e}")
             return False
-
-    def stop(self) -> bool:
-        """
-        停止此服务
-        :return: T/F
-        """
-        try:
-            self.server.shutdown()
-            return True
-        except Exception as e:
-            print(f"{e}")
-            return False
-
-    def http_get(self):
-        pass
-
-    def http_post(self):
-        pass
-
-    def http_put(self):
-        pass
-
-    def http_delete(self):
-        pass
-
-    def http_head(self):
-        pass
-
-    def http_options(self):
-        pass
-
-    def http_patch(self):
-        pass
-
-    def http_trace(self):
-        pass
-
-    def http_connect(self):
-        pass
-
-    def http_other(self):
-        pass
-
-    def http_method_get(self, method):
-        """
-        根据请求的方法获取对应的函数(请自行调用)
-        :param method: 方法名
-        :return: T/F
-        """
-        method = method.upper()
-        match method:
-            case "GET":
-                return self.http_get
-            case "POST":
-                return self.http_post
-            case "PUT":
-                return self.http_put
-            case "DELETE":
-                return self.http_delete
-            case "HEAD":
-                return self.http_head
-            case "OPTIONS":
-                return self.http_options
-            case "PATCH":
-                return self.http_patch
-            case "TRACE":
-                return self.http_trace
-            case "CONNECT":
-                return self.http_connect
-            case _:
-                return self.http_other
 
     def get_state(self):
         """获取当前的状态"""
