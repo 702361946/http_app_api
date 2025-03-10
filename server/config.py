@@ -88,6 +88,16 @@ def get_open_port():
     return False
 
 
+# 定义处理类
+class HTTPRequestRrocessing(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b'Hello, world!')
+        print(self.path)
+
+
 class HTTPMethod:
     def __init__(self):
         self.ip = server_config["server_fixed_ip"]
@@ -100,34 +110,54 @@ class HTTPMethod:
         if server_config["server_fixed_ip"] is None:
             self.ip = get_local_ip()
         if server_config["server_fixed_port"] is None:
-            self.port = get_open_port()
+            self.port = 60000
+        elif type(self.port).__name__ != 'int':
+            try:
+                self.port = int(self.port)
+            except ValueError:
+                logging.error(f"配置端口无效:{self.port}")
+                print(f"配置端口无效:{self.port}")
+                self.port = 60000
+        elif self.port < 1025 or self.port > 65535:
+            logging.error(f"配置端口超出范围:{self.port}")
+            print(f"配置端口超出范围:{self.port}")
+            self.port = 60000
 
-        # 定义请求处理类
-        # class R(BaseHTTPRequestHandler):
-        #     def do_GET(self):
-        #         self.send_response(200)
-        #         self.end_headers()
-        #         self.wfile.write(b'Hello, World!')
+        logging.info(f"ip:{self.ip}")
+        logging.info(f"port:{self.port}")
 
         create_an_attempt = 0
         while create_an_attempt < 50:
             try:
+                # 空ip会绑定到0.0.0.0上,这是不希望的
+                if self.ip == '' or self.ip == '0.0.0.0':
+                    raise WindowsError('ip不可绑定至0.0.0.0')
                 self.server = HTTPServer(
                     (self.ip, self.port),
-                    BaseHTTPRequestHandler
+                    lambda c, r, s: HTTPRequestRrocessing(c, r, s)
                 )
+
+                print(f"\n已成功创建\nip:{self.ip}\nport:{self.port}\n")
+                logging.info(f"ip&port:{self.ip}&{self.port}")
+
+                break
             except WindowsError:
-                self.ip = input(f"此地址无效,请更换地址\n当前地址:{self.ip}")
+                self.ip = input(f"此地址无效,请手动输入ip地址\n当前地址:{self.ip}")
                 create_an_attempt += 1
             except OverflowError:
                 print(f"端口已被占用或不可用\n尝试更换端口中\n当前端口:{self.port}")
-                if self.port >= 65535:
+                if self.port >= 65535 or self.port < 1025:
                     self.port = 1025
                 else:
                     self.port += 1
                 create_an_attempt += 1
             except Exception as e:
                 print(f"{e}")
+                create_an_attempt += 1
+
+        if create_an_attempt >= 50:
+            logging.error(f"创建服务失败,尝试次数封顶")
+            print(f"创建服务失败,请检查配置")
 
     def run(self) -> bool:
         """

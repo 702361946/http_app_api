@@ -10,11 +10,11 @@ match os.name:
     case 'nt':
         os_name = 'Windows'
         log_path = os.path.expanduser('~\\AppData')
-        log_path = os.path.join(log_path, 'LocalLow\\702361946\\Chemical Equation Game\\game.log')
+        log_path = os.path.join(log_path, 'LocalLow\\702361946\\HTTP\\sc.log')
     case 'posix':
         os_name = 'MacOS'
         log_path = os.path.expanduser('~/Library')
-        log_path = os.path.join(log_path, 'Logs/702361946/Chemical Equation Game/game.log')
+        log_path = os.path.join(log_path, 'Logs/702361946/HTTP/sc.log')
     case _:
         print(f"os.name:{os.name}")
         input('不支持的操作系统\n请发邮件至702361946@qq.com\n并附上python os.name输出内容')

@@ -1,0 +1,7 @@
+{
+    "server_fixed_ip": null,
+    "server_fixed_port": null,
+    "max_client": null,
+    "get_client_message_time": 10,
+    "version": "0.1"
+}
