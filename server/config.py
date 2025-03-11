@@ -29,6 +29,7 @@ if True:
             'get_client_message_time': 10,  # 获取客户端消息间隔(ms)
             'version': '0.1'
         }
+        json.dump(server_config, "config")
 
 
 def get_local_ip():

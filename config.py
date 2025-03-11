@@ -12,5 +12,6 @@ if True:
         main_value = {
             'open_s_or_r': None
         }
+        json.dump(main_value, 'config')
 
 mccae('config')

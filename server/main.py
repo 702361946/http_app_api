@@ -1,6 +1,8 @@
 #  Copyright (c) 2025.
 #  702361946@qq.com(https://github.com/702361946)
 
+from fastapi.responses import FileResponse
+
 from .config import *
 
 
@@ -16,8 +18,16 @@ def main():
     def start_logging():
         return s.get_state_logging()
 
+    @app.get('/server/routes')
+    def start_routes():
+        _t = []
+        for _i in list(s.server.routes):
+            _t.append(str(_i))
+        return _t
+
+    @app.get("/favicon.ico")
+    def get_ico():
+        return FileResponse('.\\favicon.ico')
+
     s.run()
 
-
-if __name__ == '__main__':
-    print(json.file_path)
