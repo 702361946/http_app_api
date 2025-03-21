@@ -124,7 +124,7 @@ class HTTPMethod:
             print(f"{e}")
             return False
 
-    def get_state(self):
+    async def get_state(self):
         """获取当前的状态"""
         _state = {
             'ip': self.ip,
@@ -136,7 +136,7 @@ class HTTPMethod:
         }
         return _state
 
-    def get_state_logging(self):
+    async def get_state_logging(self):
         """获取当前的状态并记录日志"""
         _state = self.get_state()
         logging.info("server_state")

@@ -1,5 +1,6 @@
 #  Copyright (c) 2025.
 #  702361946@qq.com(https://github.com/702361946)
+from fastapi import FastAPI
 
 from dependency import *
 
@@ -13,5 +14,15 @@ if True:
             'open_s_or_r': None
         }
         json.dump(main_value, 'config')
+
+
+def server_add_app(app: FastAPI):
+    @app.get("/")
+    async def hello():
+        return "Hello"
+
+
+
+
 
 mccae('config')

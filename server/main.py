@@ -6,28 +6,36 @@ from fastapi.responses import FileResponse
 from .config import *
 
 
-def main():
+def main(add_app=None):
+    """
+
+    :param add_app: 可以通过传入一个已定义的函数来添加路由,要求能默认接受一个FastAPI对象
+    :return: 无返回,直接启动
+    """
     s = HTTPMethod()
     app = s.server
 
     @app.get('/server/state')
-    def start():
-        return s.get_state()
+    async def start():
+        return await s.get_state()
 
     @app.get('/server/state_logging')
-    def start_logging():
-        return s.get_state_logging()
+    async def start_logging():
+        return await s.get_state_logging()
 
     @app.get('/server/routes')
-    def start_routes():
+    async def start_routes():
         _t = []
-        for _i in list(s.server.routes):
+        for _i in list(await s.server.routes):
             _t.append(str(_i))
         return _t
 
     @app.get("/favicon.ico")
-    def get_ico():
+    async def get_ico():
         return FileResponse('.\\favicon.ico')
+
+    if add_app is not None:
+        add_app(app)
 
     s.run()
 

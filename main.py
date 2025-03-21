@@ -10,9 +10,13 @@ while True:
         case 's':
             from server import main
 
+            main(server_add_app)
+
             break
         case 'r':
             from client import main
+
+            main()
 
             break
         case _:
@@ -26,7 +30,5 @@ while True:
                 logging.info(f"user open client")
             else:
                 print('无此选项')
-
-main()
 
 logging.info('user exit')
