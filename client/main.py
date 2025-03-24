@@ -5,8 +5,18 @@ from .config import *
 
 
 def main():
-    pass
+    t = HTTPMethod()
+    while True:
+        mode = input(f"输入请求方法\n{t.method}")
+        if mode.upper() not in t.method:
+            print("无此方法")
+            continue
 
+        while True:
+            url = input("输入请求地址(如果输入../..则重新选择请求方法)")
+            if url == '../..':
+                break
+            print(t.http_method(mode, url))
 
 if __name__ == '__main__':
     print(json.file_path)

@@ -1,0 +1,9 @@
+{
+    "server_url": null,
+    "client_fixed_port": null,
+    "automatic_logon": {
+        "open": false,
+        "username": null,
+        "password": null
+    }
+}
