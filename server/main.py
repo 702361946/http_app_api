@@ -16,15 +16,15 @@ def main(add_app=None):
     app = s.server
 
     @app.get('/server/state')
-    async def start():
+    async def state():
         return await s.get_state()
 
     @app.get('/server/state_logging')
-    async def start_logging():
+    async def state_logging():
         return await s.get_state_logging()
 
     @app.get('/server/routes')
-    async def start_routes():
+    async def get_server_routes():
         _t = []
         for _i in list(await s.server.routes):
             _t.append(str(_i))
