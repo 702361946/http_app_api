@@ -7,8 +7,10 @@ from .config import *
 def main():
     t = HTTPMethod()
     while True:
-        mode = input(f"输入请求方法\n{t.method}")
-        if mode.upper() not in t.method:
+        mode = input(f"输入请求方法\n输入exit退出\n{t.method}")
+        if mode == "exit":
+            break
+        elif mode.upper() not in t.method:
             print("无此方法")
             continue
 
