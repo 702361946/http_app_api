@@ -14,7 +14,8 @@ if True:
     if type(main_value).__name__ != 'dict':
         logging.error(f'get main_value error\n{main_value}')
         main_value = {
-            'open_s_or_r': None
+            'open_s_or_r': None,
+            "server_add_mods": []
         }
         json.dump(main_value, 'config')
 
@@ -25,12 +26,20 @@ def server_add_app(app: FastAPI):
     mods_path = os.path.join(mods_path, 'server')
 
     all_mods = []
+    add_if = False
+
+    if main_value["server_add_mods"] != {}:
+        add_if = True
 
     # 遍历mods目录
     for filename in os.listdir(mods_path):
         if filename.endswith('.py'):
             # 获取模块名（去掉.py后缀）
             module_name = filename[:-3]
+
+            if add_if:
+                if module_name not in main_value["server_add_mods"]:
+                    continue
 
             # 构建完整文件路径
             file_path = os.path.join(mods_path, filename)
@@ -45,6 +54,9 @@ def server_add_app(app: FastAPI):
         elif os.path.isdir(os.path.join(mods_path, filename)):
             init_path = os.path.join(mods_path, filename, '__init__.py')
             if os.path.exists(init_path):
+                if add_if:
+                    if filename not in main_value["server_add_mods"]:
+                        continue
                 # 如果是Python包，则动态加载
                 try:
                     module = importlib.import_module(f'mods.server.{filename}')
