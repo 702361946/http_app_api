@@ -1,6 +1,8 @@
 #  Copyright (c) 2025.
 #  702361946@qq.com(https://github.com/702361946)
 
+import asyncio
+
 from config import *
 
 srln('main')
@@ -16,7 +18,7 @@ while True:
         case 'c':
             from client import main
 
-            main()
+            asyncio.run(main())
 
             break
         case _:

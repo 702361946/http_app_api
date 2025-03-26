@@ -4,7 +4,7 @@
 from .config import *
 
 
-def main():
+async def main():
     t = HTTPMethod()
     while True:
         mode = input(f"输入请求方法\n输入exit退出\n{t.method}")
@@ -18,7 +18,7 @@ def main():
             url = input("输入请求地址(如果输入../..则重新选择请求方法)")
             if url == '../..':
                 break
-            print(t.http_method(mode, url))
+            print(await t.http_method(mode, url))
 
 if __name__ == '__main__':
     print(json.file_path)
