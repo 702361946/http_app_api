@@ -116,13 +116,23 @@ class HTTPMethod:
         运行此已定义的服务
         :return: T/F
         """
-        try:
-            print("启动中")
-            uvicorn.run(self.server, host=self.ip, port=self.port)
-            return True
-        except Exception as e:
-            print(f"{e}")
-            return False
+        t = 0
+        while True:
+            try:
+                print("启动中")
+                uvicorn.run(self.server, host=self.ip, port=self.port)
+                return True
+            except Exception as e:
+                t += 1
+                self.port += 1
+                if self.port > 65535:
+                    self.port = 10000
+
+                logging.error(f"{t}:run error\\{e}")
+
+                if t > 10000:
+                    print("尝试次数超过10000")
+                    return False
 
     async def get_state(self):
         """获取当前的状态"""
