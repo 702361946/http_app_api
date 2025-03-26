@@ -125,6 +125,7 @@ class HTTPMethod:
         :param path:
         :return:
         """
+        method = method.upper()
         match method:
             case 'GET':
                 method = self.get
