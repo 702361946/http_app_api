@@ -26,7 +26,7 @@ def main(add_app=None):
     @app.get('/server/routes')
     async def get_server_routes():
         _t = []
-        for _i in list(await s.server.routes):
+        for _i in list(s.server.routes):
             _t.append(str(_i))
         return _t
 

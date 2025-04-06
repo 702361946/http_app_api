@@ -50,6 +50,11 @@ class HTTPMethod:
         else:
             self.server_url = client_config["server_url"]
 
+        # url校验&补全
+        if self.server_url[:7] != "http://" and self.server_url[:8] != "https://":
+            print("未检出http&https头,已主动添加http://")
+            self.server_url = f"http://{self.server_url}"
+            print(f"url:{self.server_url}")
         if self.server_url[-1] == '/':
             self.server_url = self.server_url[:-1]
 

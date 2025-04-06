@@ -18,7 +18,13 @@ async def main():
             url = input("输入请求地址(如果输入../..则重新选择请求方法)")
             if url == '../..':
                 break
-            print(await t.http_method(mode, url))
+            _t = await t.http_method(mode, url)
+            try:
+                print(f"ok:{_t.ok}")
+                print(f"text:{_t.text}")
+                print(f"json:{_t.json()}")
+            except Exception as e:
+                print(f"error:{e}")
 
 if __name__ == '__main__':
     print(json.file_path)
